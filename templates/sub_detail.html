@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Subreddit - Mock Reddit</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg navbar-fixed-top justify-content-between">
+            <a href='#' class="navbar-brand">Mock Reddit</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/main">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message_center">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/sub_form">Add a Sub</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="mySubs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">My Subs</a>
+                        <div class="dropdown-menu" aria-labelledby="mySubs">
+                            <a class="dropdown-item" href="#">Sub1</a>
+                            <a class="dropdown-item" href="#">Sub2</a>
+                            <a class="dropdown-item" href="#">Sub3</a>
+                        </div>
+                    </li>
+                </ul>
+                <span class="navbar-text mr-1">Welcome {{user['username']}}!</span>
+                <form action="/logout" method="POST" class="form-inline d-inline-block">
+                    <input class="btn btn-outline-info my-2 my-sm-0" type="submit" value="Logout">
+                </form>
+            </div>
+        </nav>
+        <div class="container-fluid">
+            <div>
+                subreddit works
+            </div>
+        </div>
+    </body>
+</html>
