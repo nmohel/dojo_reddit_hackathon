@@ -15,9 +15,18 @@ def index(): #diplays login/registration page #DONE
 
  ### All get routes after login should make sure we're passing correct data for navbar/user ##
 @app.route('/main')
-def main():
-    #displays homepage
-    return render_template('homepage.html')
+def main(): #displays homepage
+    user_query = "SELECT * FROM users WHERE id = :id"
+    subs_query = """SELECT subreddits.name, subreddits.url
+    FROM subreddits
+    JOIN subscriptions ON subreddits.id = subscriptions.subreddit_id
+    JOIN users ON subscriptions.user_id = users.id
+    WHERE users.id = :id
+    """
+    data = {'id': session['user_id']}
+    user = mysql.query_db(user_query,data)
+    subs = mysql.query_db(subs_query, data)
+    return render_template('homepage.html', user=user[0], user_subs=subs)
 
 @app.route('/sub_form')
 def sub_form():
