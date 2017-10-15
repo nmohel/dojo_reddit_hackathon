@@ -47,10 +47,18 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <div>
-                {% for names in all_subreddits %}
-                    <a href="{{names['url']}}">{{names['name']}}</a>
-                {% endfor %}
+            <h2 class="my-3">All Subs!</h2>
+            <div class="col">
+                {% if all_subreddits %}
+                    {% for names in all_subreddits %}
+                    <div class="ml-3">
+                        <h3><a href="{{names['url']}}">{{names['name']}}</a></h3>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <h3 class="text-center">No subs yet!</h3>
+                    <p class="text-muted">Click <a href="/sub_form">here</a> to add your own!</p>
+                {% endif %}
             </div>
         </div>
     </body>

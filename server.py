@@ -204,24 +204,27 @@ def logout():
 
 @app.route('/sub', methods=['POST'])
 def add_sub(): #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
+    NAME_REGEX = re.compile(r'^[a-zA-Z0-9_-]+')
     addsubname = request.form['addsubname']
     url = '/subs/' + addsubname
 
-    sub_exists_query = "SELECT * FROM subreddits WHERE name = :addsubname"
-    sub_exists_data = {'addsubname': addsubname}
-    sub_exists = mysql.query_db(sub_exists_query, sub_exists_data)
-    if addsubname < 2:
-        flash("subname must be at least 2 characters")
-        return redirect('/sub_form')
-    elif sub_exists:
-        flash("A sub with this name already exists, try something else!")
-        return redirect('/sub_form')
-
+    if len(addsubname) < 2 or len(addsubname) > 45:
+        flash("Sub name must be between 2 and 45 characters")
+    elif not NAME_REGEX.match(addsubname):
+        flash("Sub name can only contain letters, numbers, dashes '-' and underscores '_'")
     else:
-        addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
-        addnew_data = {'addsubname':addsubname, 'url':url}
-        mysql.query_db(addnew_query, addnew_data)
-        return redirect(url)
+        sub_exists_query = "SELECT * FROM subreddits WHERE name = :addsubname"
+        sub_exists_data = {'addsubname': addsubname}
+        sub_exists = mysql.query_db(sub_exists_query, sub_exists_data)
+        if sub_exists:
+            flash("A sub with this name already exists, try something else!")
+        else:
+            addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
+            addnew_data = {'addsubname':addsubname, 'url':url}
+            mysql.query_db(addnew_query, addnew_data)
+            return redirect(url)
+
+    return redirect('/sub_form') #if validations fail, go back to form and flash messages
 
 
 @app.route('/post', methods=['POST'])
