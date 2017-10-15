@@ -17,11 +17,11 @@
         {% endif %}     
     </head>
     <body>
+        <nav class="navbar navbar-dark bg-dark justify-content-between mb-3">
+            <a href='#' class="navbar-brand">Mock Reddit</a>
+            <a href="#" class="btn btn-outline-info my-2 my-sm-0" data-toggle="modal" data-target="#registration_form">Register</a>
+        </nav>
         <div class="container-fluid">
-            <nav class="navbar navbar-dark bg-dark justify-content-between mb-3">
-                <a href='#' class="navbar-brand">Mock Reddit</a>
-                <a href="#" class="btn btn-outline-info my-2 my-sm-0" data-toggle="modal" data-target="#registration_form">Register</a>
-            </nav>
             <div class="row">
                 <div class="col-1"></div>
                 <div class="col-6">
@@ -59,7 +59,6 @@
                         </div>
                         <div class="modal-body">
                             <form action="/register" method="POST">
-                                <h3>Make an account!</h3>
                                 <div class="form-group">
                                     <label for="username">Username</label>
                                     <input type="text" class="form-control" id="username" name="username" placeholder="Ninjas_r_cool27">
@@ -89,8 +88,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-                
+            </div>      
         </div>
 
     </body>

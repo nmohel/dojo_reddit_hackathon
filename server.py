@@ -33,12 +33,24 @@ def sub_form():
     #displays form for adding a new sub
     return render_template('add_sub_form.html')
 
-@app.route('/subs/<subname>')
-def show_sub(subname):
-    #displays main page for each subreddit and all it's posts, also displays a form for user to add post
+@app.route('/subs/<subname>') #displays main page for each subreddit and all it's posts, also displays a form for user to add post
+def show_sub(subname): 
+    sub_query = "SELECT * FROM subreddits WHERE name = :subname" #Make sure we know what sub we are on when a user tries to add a post
+    sub_data = {'subname': subname}
+    sub_info = mysql.query_db(sub_query,sub_data)
+
     #Add logic to make sure all posts we are displaying are for this specific sub
-    #Make sure we know what sub we are on when a user tries to add a post
-    return render_template('sub_detail.html')
+    post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments FROM posts
+    LEFT JOIN users ON posts.user_id = users.id
+    LEFT JOIN comments ON posts.id = comments.post_id 
+    WHERE posts.subreddit_id = :subid
+    GROUP BY posts.id
+    """ 
+    post_data = {'subid': sub_info[0]['id']}
+    all_posts = mysql.query_db(post_query, post_data)
+    print all_posts
+
+    return render_template('sub_detail.html', sub=sub_info[0], posts=all_posts)
 
 @app.route('/subs/<subname>/<post_id>')
 def show_sub_post(subname, post_id):
@@ -128,7 +140,32 @@ def add_sub():
 @app.route('/post', methods=['POST'])
 def add_post():
     #adds a new post to a sub, make sure current user is user_id and sub_id is for correct sub
-    return
+    title = request.form['title']
+    text = request.form['text']
+    sub_id = request.form['subid']
+
+    sub_query = "SELECT * FROM subreddits WHERE id = :sub_id"
+    sub_data = {'sub_id': sub_id }
+    sub_info = mysql.query_db(sub_query, sub_data)
+    url = sub_info[0]['url']
+
+    if len(request.form['title']) < 1:
+        flash("Post title cannot be blank")
+    elif len(request.form['text']) < 1:
+        flash("Post text cannot be blank")
+    else:
+        if len(title) > 255:
+            title = title[0:255]
+        post_query = "INSERT INTO posts (text, user_id, subreddit_id, created_at, updated_at, title) VALUES (:text, :user_id, :sub_id, NOW(), NOW(), :title)"
+        post_data = { 
+            'text': request.form['text'],
+            'user_id': session['user_id'],
+            'sub_id': request.form['subid'],
+            'title': request.form['title']
+        }
+        mysql.query_db(post_query, post_data)
+        
+    return redirect(url)
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
