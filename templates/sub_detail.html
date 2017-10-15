@@ -101,29 +101,33 @@
                         </form>
                         <h5 class="my-3">Posts</h5>
                         <div class="ml-4">
-                            {% for post in posts %}
-                                <div class="row my-2">
-                                    <div class="col-2 pr-0 align-middle">
-                                        <span class="mr-1 align-middle">298</span>
-                                        <div class="d-inline-block align-middle">
-                                            <form action="" class="form-inline">
-                                                <button type="submit" class="btn text-info vote">+</button>
-                                            </form>
-                                            <form action="" class="form-inline">
-                                                <button type="submit" class="btn text-info vote">-</button>
-                                            </form>
+                            {% if posts %}
+                                {% for post in posts %}
+                                    <div class="row my-2">
+                                        <div class="col-2 pr-0 align-middle">
+                                            <span class="mr-1 align-middle">298</span>
+                                            <div class="d-inline-block align-middle">
+                                                <form action="" class="form-inline">
+                                                    <button type="submit" class="btn text-info vote">+</button>
+                                                </form>
+                                                <form action="" class="form-inline">
+                                                    <button type="submit" class="btn text-info vote">-</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="align-middle">
+                                            <h3><a class="font-weight-normal" href="/subs/{{sub['name']}}/{{post['id']}}">{{post['title']}}</a></h3>
+                                            <div class="text-muted">
+                                                <small class="mr-4">by: {{post['username']}}</small>
+                                                <small class="mr-4">comments: {{post['num_comments']}}</small>
+                                                <small>date: {{post['date']}}</small>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="align-middle">
-                                        <h3><a class="font-weight-normal" href="/subs/{{sub['name']}}/{{post['id']}}">{{post['title']}}</a></h3>
-                                        <div class="text-muted">
-                                            <small class="mr-4">by: {{post['username']}}</small>
-                                            <small class="mr-4">comments: {{post['num_comments']}}</small>
-                                            <small>date: {{post['date']}}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <h3 class="text-center my-2 text-danger">No Posts Yet!</h3>
+                            {% endif %}
                         </div>
                     </div>
                 </main>

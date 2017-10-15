@@ -281,14 +281,17 @@ def add_post():
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
-    query = "INSERT INTO comments (text, created_at, updated_at,post_id, user_id) VALUES (:text, NOW(), NOW(),:post_id, :user_id)"
-    data = {
-        'text': request.form['comment'],
-        'post_id': request.form['post_id'],
-        'user_id': session['user_id'],
-    }
-    mysql.query_db(query,data)
-    url = request.form['sub_url'] + "/" + request.form['post_id']
+    url = request.form['sub_url'] + "/" + request.form['post_id'] #url to go back to when form is submitted
+    if len(request.form['comment']) < 1:
+        flash("Comment cannot be blank")
+    else:
+        query = "INSERT INTO comments (text, created_at, updated_at,post_id, user_id) VALUES (:text, NOW(), NOW(),:post_id, :user_id)"
+        data = {
+            'text': request.form['comment'],
+            'post_id': request.form['post_id'],
+            'user_id': session['user_id'],
+        }
+        mysql.query_db(query,data)
     return redirect(url)
     
 

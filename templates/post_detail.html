@@ -70,7 +70,7 @@
                 <main class="col-sm-9 ml-sm-auto col-md-10 pt-3 mb-4" role="main">
                     <h2>{{ post['title'] }}</h2>
                     <div class="text-muted mb-3">
-                        <small class="mx-3">by: {{ post['username'] }}</small>
+                        <small class="mx-3">by: <a href="#">{{ post['username'] }}</a></small>
                         <small>on {{ post['date'] }}</small>
                     </div>
                     <p class="m-3 col-11">{{ post['text'] }}</p>
@@ -97,25 +97,29 @@
                         </form>
                         <h5 class="my-3">Comments</h5>
                         <div class="ml-4">
-                            {% for y in all_comments %}
-                                <div class="row my-2">
-                                    <div class="col-1 px-0">
-                                        <span class="mr-1 align-middle">298</span>
-                                        <div class="d-inline-block align-middle">
-                                            <form action="" class="form-inline">
-                                                <button type="submit" class="btn text-info vote">+</button>
-                                            </form>
-                                            <form action="" class="form-inline">
-                                                <button type="submit" class="btn text-info vote">-</button>
-                                            </form>
+                            {% if all_comments %}
+                                {% for y in all_comments %}
+                                    <div class="row my-2">
+                                        <div class="col-1 px-0">
+                                            <span class="mr-1 align-middle">298</span>
+                                            <div class="d-inline-block align-middle">
+                                                <form action="" class="form-inline">
+                                                    <button type="submit" class="btn text-info vote">+</button>
+                                                </form>
+                                                <form action="" class="form-inline">
+                                                    <button type="submit" class="btn text-info vote">-</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <small class="font-weight-normal ml-1">by <a href="#">{{y['username']}}</a><span class="text-muted ml-2">{{ y['date'] }}</span></small>
+                                            <p>{{ y['text'] }}</p>
                                         </div>
                                     </div>
-                                    <div class="col">
-                                        <small class="font-weight-normal ml-1">by <a href="#">{{y['username']}}</a><span class="text-muted ml-2">{{ y['date'] }}</span></small>
-                                        <p>{{ y['text'] }}</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                <h4 class="text-center my-2 text-danger">No Comments Yet!</h4>
+                            {% endif %}
                         </div>
                     </div>
                 </main>
