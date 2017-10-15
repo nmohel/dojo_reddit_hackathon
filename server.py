@@ -340,7 +340,7 @@ def up():
 
     #TODO 
     # check if it's a comment or a post
-    # do correct query to change vote (+1?)
+    # do correct query to change vote (type = 1?)
 
     return redirect(url)
 
@@ -350,7 +350,7 @@ def down():
 
    #TODO 
     # check if it's a comment or a post
-    # do correct query to change vote (-1?)
+    # do correct query to change vote (type = -1?)
 
     return redirect(url)
 

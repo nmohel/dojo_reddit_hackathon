@@ -74,11 +74,13 @@
                                 <div class="col-1 pr-0 align-middle">
                                     <span class="mr-1 align-middle">298</span> <!-- TODO: Change this to actual number of votes once upvoting works-->
                                     <div class="d-inline-block align-middle">
-                                        <form action="/upvote" class="form-inline">
+                                        <form action="/upvote" method="POST" class="form-inline">
+                                            <input type="hidden" name="url" value="/main">
                                             <input type="hidden" name="post_id" value="{{ post['id'] }}">
                                             <button type="submit" class="btn text-info vote">+</button>
                                         </form>
-                                        <form action="/downvote" class="form-inline">
+                                        <form action="/downvote" method="POST" class="form-inline">
+                                            <input type="hidden" name="url" value="/main">                                            
                                             <input type="hidden" name="post_id" value="{{ post['id'] }}">                                            
                                             <button type="submit" class="btn text-info vote">-</button>
                                         </form>
