@@ -268,9 +268,16 @@ def subscribe():
     sub_info = mysql.query_db(sub_query, sub_data)
     url = sub_info[0]['url']
 
-    query = "INSERT INTO subscriptions (user_id, subreddit_id, moderator) VALUES (:user_id, :sub_id, 0)"
-    data = {'user_id': session['user_id'], 'sub_id': sub_id}
-    mysql.query_db(query,data)
+    #check if user is already subscribed
+    is_subscribed_query = "SELECT * FROM subscriptions WHEREs subscriptions.subreddit_id = :subid AND subscriptions.user_id = :userid"
+    is_subscribed_data = {'subid':sub_id, 'userid': session['user_id']}
+    is_subscribed = mysql.query_db(is_subscribed_query,is_subscribed_data)
+
+    if not is_subscribed:
+        query = "INSERT INTO subscriptions (user_id, subreddit_id, moderator) VALUES (:user_id, :sub_id, 0)"
+        data = {'user_id': session['user_id'], 'sub_id': sub_id}
+        mysql.query_db(query,data)
+    
     return redirect(url)
 
 
