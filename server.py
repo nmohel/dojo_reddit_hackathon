@@ -180,7 +180,16 @@ def send_message():
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
     #subscribes user to sub
-    return
+    sub_id = request.form['subid']
+    sub_query = "SELECT * FROM subreddits WHERE id = :subid"
+    sub_data = {'subid': sub_id}
+    sub_info = mysql.query_db(sub_query, sub_data)
+    url = sub_info[0]['url']
+
+    query = "INSERT INTO subscriptions (user_id, subreddit_id, moderator) VALUES (:user_id, :sub_id, 0)"
+    data = {'user_id': session['user_id'], 'sub_id': sub_id}
+    mysql.query_db(query,data)
+    return redirect(url)
 
 
 app.run(debug=True)

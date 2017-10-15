@@ -49,6 +49,7 @@
                 <h2 class="justify-content-between">
                     <span class="d-inline-block mr-auto">{{sub['name']}}</span>
                     <form action="/subscribe" method="POST" class="form-inline d-inline-block">
+                        <input type="hidden" name="subid" value="{{sub['id']}}">
                         <input class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Subscribe">
                     </form>
                 </h2>
