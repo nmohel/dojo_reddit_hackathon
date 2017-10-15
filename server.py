@@ -8,7 +8,7 @@ app.secret_key = "NotASecretAnymore"
 mysql = MySQLConnector(app,'reddit')
 
 
-### GET ROUTES ###
+## GET ROUTES ###
 @app.route('/')
 def index(): #diplays login/registration page #DONE
     return render_template('index.html')
@@ -35,19 +35,48 @@ def sub_form():
     #displays form for adding a new sub
     return render_template('add_sub_form.html')
 
-@app.route('/subs/<subname>')
-def show_sub(subname):
-    #displays main page for each subreddit and all it's posts, also displays a form for user to add post
+@app.route('/subs/<subname>') #displays main page for each subreddit and all it's posts, also displays a form for user to add post
+def show_sub(subname): 
+    sub_query = "SELECT * FROM subreddits WHERE name = :subname" #Make sure we know what sub we are on when a user tries to add a post
+    sub_data = {'subname': subname}
+    sub_info = mysql.query_db(sub_query,sub_data)
+
     #Add logic to make sure all posts we are displaying are for this specific sub
-    #Make sure we know what sub we are on when a user tries to add a post
-    return render_template('sub_detail.html')
+    post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date
+    FROM posts
+    LEFT JOIN users ON posts.user_id = users.id
+    LEFT JOIN comments ON posts.id = comments.post_id 
+    WHERE posts.subreddit_id = :subid
+    GROUP BY posts.id
+    """ 
+    post_data = {'subid': sub_info[0]['id']}
+    all_posts = mysql.query_db(post_query, post_data)
+    print all_posts
+
+    return render_template('sub_detail.html', sub=sub_info[0], posts=all_posts)
 
 @app.route('/subs/<subname>/<post_id>')
 def show_sub_post(subname, post_id):
-    #displays main page for each post and all it's comments, also displays a form for user to add comment
-    #Add logic to make sure all comments are for this specific post
-    #Make sure we know what post we are on when user tries to add a comment
-    return render_template('post_detail.html')
+    post_query = """SELECT users.username, posts.text, posts.created_at, posts.id , posts.title, subreddits.url
+    FROM posts
+    LEFT JOIN users ON users.id = posts.user_id
+    LEFT JOIN subreddits ON subreddits.id = posts.subreddit_id
+    WHERE posts.id = :post_id
+    """
+    data = {'post_id': post_id}
+                          
+    post = mysql.query_db(post_query, data)    
+
+    comments_query = """SELECT users.username,comments.text, comments.created_at, comments.post_id 
+    FROM users JOIN comments ON users.id = comments.user_id
+    WHERE comments.post_id = :post_id
+    """
+                          
+    comments = mysql.query_db(comments_query,data)  
+    print post
+
+    return render_template('post_detail.html',post=post[0], all_comments= comments)
+    
 
 @app.route('/message_center')
 def show_messages():
@@ -55,7 +84,7 @@ def show_messages():
     #also displays form to send a new message
     return render_template('message_center.html')
 
-## POST ROUTES ##
+# POST ROUTES ##
 @app.route('/login', methods=['POST']) #DONE
 def login():
     username = request.form['username']
@@ -132,15 +161,52 @@ def add_sub():
     mysql.query_db(addnew_query, addnew_data)
     return redirect(url)
 
+
+
+
+
 @app.route('/post', methods=['POST'])
 def add_post():
     #adds a new post to a sub, make sure current user is user_id and sub_id is for correct sub
-    return
+    title = request.form['title']
+    text = request.form['text']
+    sub_id = request.form['subid']
+
+    sub_query = "SELECT * FROM subreddits WHERE id = :sub_id"
+    sub_data = {'sub_id': sub_id }
+    sub_info = mysql.query_db(sub_query, sub_data)
+    url = sub_info[0]['url']
+
+    if len(request.form['title']) < 1:
+        flash("Post title cannot be blank")
+    elif len(request.form['text']) < 1:
+        flash("Post text cannot be blank")
+    else:
+        if len(title) > 255:
+            title = title[0:255]
+        post_query = "INSERT INTO posts (text, user_id, subreddit_id, created_at, updated_at, title) VALUES (:text, :user_id, :sub_id, NOW(), NOW(), :title)"
+        post_data = { 
+            'text': request.form['text'],
+            'user_id': session['user_id'],
+            'sub_id': request.form['subid'],
+            'title': request.form['title']
+        }
+        mysql.query_db(post_query, post_data)
+        
+    return redirect(url)
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
-    #adds a new comment to a post, make sure current user is user_id and post_id is for correct post
-    return
+    query = "INSERT INTO comments (text, created_at, updated_at,post_id, user_id) VALUES (:text, NOW(), NOW(),:post_id, :user_id)"
+    data = {
+        'text': request.form['comment'],
+        'post_id': request.form['post_id'],
+        'user_id': session['user_id'],
+    }
+    mysql.query_db(query,data)
+    url = request.form['sub_url'] + "/" + request.form['post_id']
+    return redirect(url)
+    
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
@@ -150,7 +216,16 @@ def send_message():
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
     #subscribes user to sub
-    return
+    sub_id = request.form['subid']
+    sub_query = "SELECT * FROM subreddits WHERE id = :subid"
+    sub_data = {'subid': sub_id}
+    sub_info = mysql.query_db(sub_query, sub_data)
+    url = sub_info[0]['url']
+
+    query = "INSERT INTO subscriptions (user_id, subreddit_id, moderator) VALUES (:user_id, :sub_id, 0)"
+    data = {'user_id': session['user_id'], 'sub_id': sub_id}
+    mysql.query_db(query,data)
+    return redirect(url)
 
 
 app.run(debug=True)
