@@ -141,7 +141,7 @@ def register():
             'username': username,
             'password':password
             }
-            mysql.query_db(register_query,register_data) #insert new row to the database, and keep the value of that row's id
+            session['user_id'] = mysql.query_db(register_query,register_data) #insert new row to the database, and keep the value of that row's id
             session.pop('register')
             return redirect('/main')
     return redirect('/') #redirect if form isn't valid for some reason or email already in db
@@ -153,13 +153,8 @@ def logout():
 
 @app.route('/sub', methods=['POST'])
 def add_sub():
-    addsubname = request.form['addsubname']
-    url = 'subs/' + addsubname
     #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
-    addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
-    addnew_data = {'addsubname':addsubname, 'url':url}
-    mysql.query_db(addnew_query, addnew_data)
-    return redirect(url)
+    return
 
 
 
