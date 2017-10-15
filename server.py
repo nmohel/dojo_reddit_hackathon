@@ -24,12 +24,23 @@ def main(): #displays homepage
         JOIN users ON subscriptions.user_id = users.id
         WHERE users.id = :id
         """
-        subnames_query = "SELECT * FROM subreddits"  
+        posts_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date, subreddits.name AS sub_name, subreddits.url AS sub_url
+        FROM posts
+        LEFT JOIN users ON posts.user_id = users.id
+        LEFT JOIN comments ON posts.id = comments.post_id
+        LEFT JOIN subreddits ON posts.subreddit_id = subreddits.id
+        GROUP BY posts.id
+        ORDER BY posts.created_at DESC
+        LIMIT 50
+        """
+        subnames_query = "SELECT * FROM subreddits" 
         data = {'id': session['user_id']}
         user = mysql.query_db(user_query,data)
         subs = mysql.query_db(subs_query, data)
+        posts = mysql.query_db(posts_query)
         subnames = mysql.query_db(subnames_query)
-        return render_template('homepage.html', user=user[0], user_subs=subs, all_subreddits=subnames)
+
+        return render_template('homepage.html', user=user[0], user_subs=subs, all_subreddits=subnames, all_posts=posts)
     else:
         return redirect('/') #redirect to login page if no user is signed in
 
@@ -223,7 +234,6 @@ def add_sub(): #Adds a new subreddit, make sure current logged in user is subscr
             addnew_data = {'addsubname':addsubname, 'url':url}
             mysql.query_db(addnew_query, addnew_data)
             return redirect(url)
-
     return redirect('/sub_form') #if validations fail, go back to form and flash messages
 
 

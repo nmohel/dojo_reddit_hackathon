@@ -5,10 +5,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+        <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">       
     </head>
     <body>
         <nav class="navbar navbar-dark bg-dark navbar-expand-lg navbar-fixed-top justify-content-between">
@@ -19,7 +20,7 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/main">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="/main">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/message_center">Messages</a>
@@ -35,7 +36,7 @@
                                     <a class="dropdown-item" href="{{sub['url']}}">{{sub['name']}}</a>
                                 {% endfor %}
                             {% else %}
-                                <span class="dropdown-item">No subs yet!</span>
+                                <span class="dropdown-item">No subcriptions yet!</span>
                             {% endif %}
                         </div>
                     </li>
@@ -47,18 +48,52 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <h2 class="my-3">All Subs!</h2>
-            <div class="col">
-                {% if all_subreddits %}
-                    {% for names in all_subreddits %}
-                    <div class="ml-3">
-                        <h3><a href="{{names['url']}}">{{names['name']}}</a></h3>
-                    </div>
+            <div class="row">
+                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark h4" href="/main">All Subs</a>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        {% if all_subreddits %}
+                            {% for names in all_subreddits %}
+                                <li class="nav-item">
+                                    <a class="nav-link ml-3" href="{{names['url']}}">/{{names['name']}}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item">
+                                <span>No Subs Yet!</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
+                    {% for post in all_posts %}
+                        <div class="row my-2">
+                            <div class="col-1 pr-0 align-middle">
+                                <span class="mr-1 align-middle">298</span>
+                                <div class="d-inline-block align-middle">
+                                    <form action="" class="form-inline">
+                                        <button type="submit" class="btn text-info vote">+</button>
+                                    </form>
+                                    <form action="" class="form-inline">
+                                        <button type="submit" class="btn text-info vote">-</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="align-middle">
+                                <h3><a class="font-weight-normal" href="{{post['sub_url']}}/{{post['id']}}">{{post['title']}}</a></h3>
+                                <div class="text-muted">
+                                    <small class="ml-1 mr-4"><a href="{{post['sub_url']}}'">/{{post['sub_name']}}</a></small>
+                                    <small class="mr-4">by: {{post['username']}}</small>
+                                    <small class="mr-4">comments: {{post['num_comments']}}</small>
+                                    <small>date: {{post['date']}}</small>
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
-                {% else %}
-                    <h3 class="text-center">No subs yet!</h3>
-                    <p class="text-muted">Click <a href="/sub_form">here</a> to add your own!</p>
-                {% endif %}
+                </main>
             </div>
         </div>
     </body>
