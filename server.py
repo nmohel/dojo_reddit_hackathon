@@ -117,7 +117,7 @@ def show_sub_post(subname, post_id):
         subnames = mysql.query_db(subnames_query)
 
         ### View specific logic ###
-        post_query = """SELECT users.username, posts.text, posts.created_at, posts.id , posts.title, subreddits.url
+        post_query = """SELECT users.username, posts.text, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date, posts.id , posts.title, subreddits.url
         FROM posts
         LEFT JOIN users ON users.id = posts.user_id
         LEFT JOIN subreddits ON subreddits.id = posts.subreddit_id
@@ -126,9 +126,10 @@ def show_sub_post(subname, post_id):
         data = {'post_id': post_id}
         post = mysql.query_db(post_query, data)    
 
-        comments_query = """SELECT users.username,comments.text, comments.created_at, comments.post_id 
+        comments_query = """SELECT users.username,comments.text, DATE_FORMAT(comments.updated_at, '%b %d, %Y at %r') AS date, comments.post_id 
         FROM users JOIN comments ON users.id = comments.user_id
         WHERE comments.post_id = :post_id
+        ORDER BY comments.created_at DESC
         """     
         comments = mysql.query_db(comments_query,data)
         return render_template('post_detail.html',user=user[0], user_subs=user_subs, all_subreddits=subnames, post=post[0], all_comments=comments)

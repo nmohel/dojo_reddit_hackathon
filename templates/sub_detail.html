@@ -69,13 +69,13 @@
                 </nav>
                 <main class="col-sm-9 ml-sm-auto col-md-10 pt-3 mb-4" role="main">
                     <header class="row mb-3">
-                        <h2 class="col-8">{{sub['name']}}</h2>
-                        <form action="/subscribe" method="POST" class="form-inline col">
+                        <h2 class="col">{{sub['name']}}</h2>
+                        <form action="/subscribe" method="POST" class="form-inline col-3">
                             <input type="hidden" name="subid" value="{{sub['id']}}">
                             <input class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Subscribe">
                         </form>
                     </header>
-                    <div class="col-9">
+                    <div class="col-10">
                         <form action="/post" method="POST" class="ml-3 mb-3">
                             <h5>Add Post</h5>
                             <input type="hidden" name="subid" value="{{ sub['id'] }}">
@@ -96,10 +96,10 @@
                             {% endwith %}
                             <div class="form-row">
                                 <div class="col"></div>
-                                <button type="submit" class="btn btn-small btn-primary col-2">Add Post</button>
+                                <button type="submit" class="btn btn-small btn-info col-2">Add Post</button>
                             </div>
                         </form>
-                        <h5 class="my-3">All Posts</h5>
+                        <h5 class="my-3">Posts</h5>
                         <div class="ml-4">
                             {% for post in posts %}
                                 <div class="row my-2">

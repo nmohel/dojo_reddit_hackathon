@@ -68,39 +68,56 @@
                     </ul>
                 </nav>
                 <main class="col-sm-9 ml-sm-auto col-md-10 pt-3 mb-4" role="main">
-
-
-
-
-
-                        <p> {{ post['username'] }}</p>
-                        <p>{{ post['text'] }}<p>
-                        <p>{{ post['created_at'] }} </p>
-                        
-                        <form action='/comment' method='POST'>
-                              <input type="hidden" name="sub_url" value="{{post['url']}}">
+                    <h2>{{ post['title'] }}</h2>
+                    <div class="text-muted mb-3">
+                        <small class="mx-3">by: {{ post['username'] }}</small>
+                        <small>on {{ post['date'] }}</small>
+                    </div>
+                    <p class="m-3 col-11">{{ post['text'] }}</p>
+                    <div class="col-10">
+                        <form action="/comment" method="POST" class="ml-3 mb-3">
+                            <h5>Post a comment</h5>
+                            <input type="hidden" name="sub_url" value="{{post['url']}}">
                             <input type="hidden" name="post_id" value="{{post['id']}}">
-                            <label for="comment">Post a comment: </label>
-                            <p></p>
-                            <textarea rows="10" cols="150" name="comment" id="comment"></textarea>
-                            <input type="submit" value="Submit">
+                            <div class="form-group">
+                                <label for="comment">Text</label>
+                                <textarea class="form-control" id="comment" name="comment" rows="4"></textarea>
+                            </div>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-danger" role="alert">{{message}}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                            <div class="form-row">
+                                <div class="col"></div>
+                                <button type="submit" class="btn btn-small btn-info col-3">Add Comment</button>
+                            </div>
                         </form>
-                        {% for y in all_comments: %}
-                           
-                                <div style="margin-left: 20px; color:#AD3249" >
-                                    <P>Comments:</P>
-                                    <p>{{ y['username'] }}</p>
-                                    <p>{{ y['created_at'] }} </p>
-                                    <p>{{ y['text'] }} </p>
+                        <h5 class="my-3">Comments</h5>
+                        <div class="ml-4">
+                            {% for y in all_comments %}
+                                <div class="row my-2">
+                                    <div class="col-1 px-0">
+                                        <span class="mr-1 align-middle">298</span>
+                                        <div class="d-inline-block align-middle">
+                                            <form action="" class="form-inline">
+                                                <button type="submit" class="btn text-info vote">+</button>
+                                            </form>
+                                            <form action="" class="form-inline">
+                                                <button type="submit" class="btn text-info vote">-</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <small class="font-weight-normal ml-1">by <a href="#">{{y['username']}}</a><span class="text-muted ml-2">{{ y['date'] }}</span></small>
+                                        <p>{{ y['text'] }}</p>
+                                    </div>
                                 </div>
-                        {% endfor %}
-
-
-
-
-
-
-
+                            {% endfor %}
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>
