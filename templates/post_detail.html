@@ -11,7 +11,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     </head>
     <body>
-        <nav class="navbar navbar-dark bg-dark navbar-expand-lg navbar-fixed-top justify-content-between">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg fixed-top justify-content-between">
             <a href='/main' class="navbar-brand">Mock Reddit</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -47,55 +47,61 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <div>
-                <style>
-                    input {
-                      background-color: #000000;
-                      color: #FFFFFF;
-                      font-weight: bold;
-                      font-size: 15px;
-                      width: 100px;
-                      padding: 10px;
-                      border-radius: 10px;
-                      -moz-border-radius: 10px;
-                      -webkit-border-radius: 10px;}
-                
-                </style>
-              </head>
-              <body>
-                  <h1></h1>
-      
-                  <!-- <form action='/post' method='POST'>
-                      <label for="text">Post a message: </label>
-                      <div>
-                          <textarea rows="15" cols="100" name="text" id="text"></textarea>
-                      </div>
-                      <input type="submit" value="Submit">
-                  </form> -->
-                
-                      
-                      <p> {{ post['username'] }}</p>
-                      <p>{{ post['text'] }}<p>
-                      <p>{{ post['created_at'] }} </p>
-                      
-                      <form action='/comment' method='POST'>
-                            <input type="hidden" name="sub_url" value="{{post['url']}}">
-                          <input type="hidden" name="post_id" value="{{post['id']}}">
-                          <label for="comment">Post a comment: </label>
-                          <p></p>
-                          <textarea rows="10" cols="150" name="comment" id="comment"></textarea>
-                          <input type="submit" value="Submit">
-                      </form>
-                      {% for y in all_comments: %}
-                         
-                              <div style="margin-left: 20px; color:#AD3249" >
-                                  <P>Comments:</P>
-                                  <p>{{ y['username'] }}</p>
-                                  <p>{{ y['created_at'] }} </p>
-                                  <p>{{ y['text'] }} </p>
-                              </div>
-                      {% endfor %}
-      
+            <div class="row">
+                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark h4" href="/main">All Subs</a>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        {% if all_subreddits %}
+                            {% for names in all_subreddits %}
+                                <li class="nav-item">
+                                    <a class="nav-link ml-3" href="{{names['url']}}">/{{names['name']}}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">No Subs Yet!</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <main class="col-sm-9 ml-sm-auto col-md-10 pt-3 mb-4" role="main">
+
+
+
+
+
+                        <p> {{ post['username'] }}</p>
+                        <p>{{ post['text'] }}<p>
+                        <p>{{ post['created_at'] }} </p>
+                        
+                        <form action='/comment' method='POST'>
+                              <input type="hidden" name="sub_url" value="{{post['url']}}">
+                            <input type="hidden" name="post_id" value="{{post['id']}}">
+                            <label for="comment">Post a comment: </label>
+                            <p></p>
+                            <textarea rows="10" cols="150" name="comment" id="comment"></textarea>
+                            <input type="submit" value="Submit">
+                        </form>
+                        {% for y in all_comments: %}
+                           
+                                <div style="margin-left: 20px; color:#AD3249" >
+                                    <P>Comments:</P>
+                                    <p>{{ y['username'] }}</p>
+                                    <p>{{ y['created_at'] }} </p>
+                                    <p>{{ y['text'] }} </p>
+                                </div>
+                        {% endfor %}
+
+
+
+
+
+
+
+                </main>
             </div>
         </div>
     </body>

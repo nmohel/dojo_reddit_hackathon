@@ -47,22 +47,45 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <h2 class="my-3">Make a New Sub!</h2>
-            <div class="col-9">
-                <form action="/sub" method="POST">
-                    <div class="form-group">
-                        <label for="addsubname">Name</label>
-                        <input type="text" class="form-control" id="addsubname" name="addsubname" placeholder="Unique_name">
-                    </div>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            {% for message in messages %}
-                            <div class="alert alert-danger" role="alert">{{message}}</div>
+            <div class="row">
+                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark h4" href="/main">All Subs</a>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        {% if all_subreddits %}
+                            {% for names in all_subreddits %}
+                                <li class="nav-item">
+                                    <a class="nav-link ml-3" href="{{names['url']}}">/{{names['name']}}</a>
+                                </li>
                             {% endfor %}
+                        {% else %}
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">No Subs Yet!</span>
+                            </li>
                         {% endif %}
-                    {% endwith %}
-                    <button type="submit" class="btn btn-primary mr-3">Make it!</button><a class="btn btn-outline-secondary" href="/main">Nevermind..</a>
-                </form>
+                    </ul>
+                </nav>
+                <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
+                    <h2 class="my-3">Make a New Sub!</h2>
+                    <div class="col-9">
+                        <form action="/sub" method="POST">
+                            <div class="form-group">
+                                <label for="addsubname">Name</label>
+                                <input type="text" class="form-control" id="addsubname" name="addsubname" placeholder="Unique_name">
+                            </div>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                    <div class="alert alert-danger" role="alert">{{message}}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                            <button type="submit" class="btn btn-primary mr-3">Make it!</button><a class="btn btn-outline-secondary" href="/main">Nevermind..</a>
+                        </form>
+                    </div>
+                </main>
             </div>
         </div>
     </body>

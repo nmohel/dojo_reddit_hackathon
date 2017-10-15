@@ -1,12 +1,17 @@
+body {
+    padding-top: 3.5rem;
+  }
+  
 .sidebar {
     position: fixed;
+    top: 51px;
+    bottom: 0;
     left: 0;
     z-index: 1000;
-    padding: 10px;
+    padding: 20px;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
     border-right: 1px solid #eee;
-    height:  100%
 }
 .sidebar {
     padding-left: 0;

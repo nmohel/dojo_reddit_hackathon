@@ -55,9 +55,11 @@ def sub_form(): #displays form for adding a new sub
         WHERE users.id = :id
         """
         data = {'id': session['user_id']}
+        subnames_query = "SELECT * FROM subreddits"
         user = mysql.query_db(user_query,data)
         subs = mysql.query_db(subs_query, data)
-        return render_template('add_sub_form.html', user=user[0], user_subs=subs)
+        subnames = mysql.query_db(subnames_query)
+        return render_template('add_sub_form.html', user=user[0], user_subs=subs, all_subreddits=subnames)
     else:
         return redirect('/') #redirect to login page if no user is signed in
 
@@ -75,6 +77,8 @@ def show_sub(subname):
         data = {'id': session['user_id']}
         user = mysql.query_db(user_query,data)
         user_subs = mysql.query_db(user_subs_query, data)
+        subnames_query = "SELECT * FROM subreddits"
+        subnames = mysql.query_db(subnames_query)
 
         ### View specific logic ###
         sub_query = "SELECT * FROM subreddits WHERE name = :subname" #Make sure we know what sub we are on so we can show relevent data
@@ -87,10 +91,11 @@ def show_sub(subname):
         LEFT JOIN comments ON posts.id = comments.post_id 
         WHERE posts.subreddit_id = :subid
         GROUP BY posts.id
+        ORDER BY posts.created_at DESC
         """ 
         post_data = {'subid': sub_info[0]['id']}
         all_posts = mysql.query_db(post_query, post_data)
-        return render_template('sub_detail.html', user=user[0], user_subs=user_subs, sub=sub_info[0], posts=all_posts)
+        return render_template('sub_detail.html', user=user[0], user_subs=user_subs, all_subreddits=subnames, sub=sub_info[0], posts=all_posts)
     else:
         return redirect('/') #redirect to login if no user is currently logged in
 
@@ -108,6 +113,8 @@ def show_sub_post(subname, post_id):
         basic_data = {'id': session['user_id']}
         user = mysql.query_db(user_query,basic_data)
         user_subs = mysql.query_db(user_subs_query, basic_data)
+        subnames_query = "SELECT * FROM subreddits"
+        subnames = mysql.query_db(subnames_query)
 
         ### View specific logic ###
         post_query = """SELECT users.username, posts.text, posts.created_at, posts.id , posts.title, subreddits.url
@@ -124,7 +131,7 @@ def show_sub_post(subname, post_id):
         WHERE comments.post_id = :post_id
         """     
         comments = mysql.query_db(comments_query,data)
-        return render_template('post_detail.html',user=user[0], user_subs=user_subs, post=post[0], all_comments=comments)
+        return render_template('post_detail.html',user=user[0], user_subs=user_subs, all_subreddits=subnames, post=post[0], all_comments=comments)
     else:
         return redirect('/') #redirect to login if no user is logged in
     
@@ -132,6 +139,7 @@ def show_sub_post(subname, post_id):
 @app.route('/message_center')
 def show_messages(): #displays all messages sent to currently logged in user and forms with option to reply, also displays form to send a new message
     if 'user_id' in session:
+        ### Getting basic user info and all subs they are subscribed to along with info for navbar###
         user_query = "SELECT * FROM users WHERE id = :id"
         subs_query = """SELECT subreddits.name, subreddits.url
         FROM subreddits
@@ -142,7 +150,10 @@ def show_messages(): #displays all messages sent to currently logged in user and
         data = {'id': session['user_id']}
         user = mysql.query_db(user_query,data)
         subs = mysql.query_db(subs_query, data)
-        return render_template('message_center.html', user=user[0], user_subs=subs)
+        subnames_query = "SELECT * FROM subreddits"
+        subnames = mysql.query_db(subnames_query)
+
+        return render_template('message_center.html', user=user[0], user_subs=subs, all_subreddits=subnames)
     else:
         return redirect('/') #redirect to login page if no user is signed in
 

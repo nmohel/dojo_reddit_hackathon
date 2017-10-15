@@ -11,7 +11,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     </head>
     <body>
-        <nav class="navbar navbar-dark bg-dark navbar-expand-lg navbar-fixed-top justify-content-between mb-3">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg fixed-top justify-content-between mb-3">
             <a href='#' class="navbar-brand">Mock Reddit</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -47,53 +47,87 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <header class="flex-row">
-                <h2 class="justify-content-between">
-                    <span class="d-inline-block mr-auto">{{sub['name']}}</span>
-                    <form action="/subscribe" method="POST" class="form-inline d-inline-block">
-                        <input type="hidden" name="subid" value="{{sub['id']}}">
-                        <input class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Subscribe">
-                    </form>
-                </h2>
-            </header>
-            
             <div class="row">
-                <div class="col">
-                    <form action="/post" method="POST" class="ml-3">
-                        <h5>Add Post</h5>
-                        <input type="hidden" name="subid" value="{{ sub['id'] }}">
-                        <div class="form-group">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title">
-                        </div>
-                        <div class="form-group">
-                            <label for="text">Content</label>
-                            <textarea class="form-control" id="text" name="text" rows="5"></textarea>
-                        </div>
-                        {% with messages = get_flashed_messages() %}
-                            {% if messages %}
-                                {% for message in messages %}
-                                <div class="alert alert-danger" role="alert">{{message}}</div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
-                        <button type="submit" class="btn btn-primary">Add Post</button>
-                    </form>
-                    <h5 class="my-3">All Posts</h5>
-                    <div class="ml-4">
-                        {% for post in posts %}
-                            <div class="my-2">
-                                <button type="button" class="btn btn-sm btn-info mr-2">Vote!</button>
-                                <a href="/subs/{{sub['name']}}/{{post['id']}}">{{post['title']}}</a>
+                <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark h4" href="/main">All Subs</a>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        {% if all_subreddits %}
+                            {% for names in all_subreddits %}
+                                <li class="nav-item">
+                                    <a class="nav-link ml-3" href="{{names['url']}}">/{{names['name']}}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">No Subs Yet!</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <main class="col-sm-9 ml-sm-auto col-md-10 pt-3 mb-4" role="main">
+                    <header class="row mb-3">
+                        <h2 class="col-8">{{sub['name']}}</h2>
+                        <form action="/subscribe" method="POST" class="form-inline col">
+                            <input type="hidden" name="subid" value="{{sub['id']}}">
+                            <input class="btn btn-outline-primary my-2 my-sm-0" type="submit" value="Subscribe">
+                        </form>
+                    </header>
+                    <div class="col-9">
+                        <form action="/post" method="POST" class="ml-3 mb-3">
+                            <h5>Add Post</h5>
+                            <input type="hidden" name="subid" value="{{ sub['id'] }}">
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title">
                             </div>
-                            <div class="text-muted">
-                                <small class="mr-4">by: {{post['username']}}</small><small class="mr-4">comments: {{post['num_comments']}}</small><small>date: {{post['date']}}</small>
+                            <div class="form-group">
+                                <label for="text">Content</label>
+                                <textarea class="form-control" id="text" name="text" rows="4"></textarea>
                             </div>
-                        {% endfor %}
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-danger" role="alert">{{message}}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                            <div class="form-row">
+                                <div class="col"></div>
+                                <button type="submit" class="btn btn-small btn-primary col-2">Add Post</button>
+                            </div>
+                        </form>
+                        <h5 class="my-3">All Posts</h5>
+                        <div class="ml-4">
+                            {% for post in posts %}
+                                <div class="row my-2">
+                                    <div class="col-2 pr-0 align-middle">
+                                        <span class="mr-1 align-middle">298</span>
+                                        <div class="d-inline-block align-middle">
+                                            <form action="" class="form-inline">
+                                                <button type="submit" class="btn text-info vote">+</button>
+                                            </form>
+                                            <form action="" class="form-inline">
+                                                <button type="submit" class="btn text-info vote">-</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="align-middle">
+                                        <h3><a class="font-weight-normal" href="/subs/{{sub['name']}}/{{post['id']}}">{{post['title']}}</a></h3>
+                                        <div class="text-muted">
+                                            <small class="mr-4">by: {{post['username']}}</small>
+                                            <small class="mr-4">comments: {{post['num_comments']}}</small>
+                                            <small>date: {{post['date']}}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
+                </main>
             </div>
-            
         </div>
     </body>
 </html>
