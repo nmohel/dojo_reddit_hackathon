@@ -9,8 +9,8 @@ mysql = MySQLConnector(app,'reddit')
 
 
 ## GET ROUTES ###
-@app.route('/')
-def index(): #diplays login/registration page #DONE
+@app.route('/') #DONE
+def index(): #diplays login/registration page
     return render_template('index.html')
 
  ### All get routes after login should make sure we're passing correct data for navbar/user ##
@@ -24,6 +24,7 @@ def main(): #displays homepage
         JOIN users ON subscriptions.user_id = users.id
         WHERE users.id = :id
         """
+        ## TODO: Add to query to include number of votes once votes work ##
         posts_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date, subreddits.name AS sub_name, subreddits.url AS sub_url
         FROM posts
         LEFT JOIN users ON posts.user_id = users.id
@@ -85,6 +86,7 @@ def show_sub(subname):
         sub_data = {'subname': subname}
         sub_info = mysql.query_db(sub_query,sub_data)
 
+        ## TODO: Add to query to include number of votes once votes work ##
         post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date
         FROM posts
         LEFT JOIN users ON posts.user_id = users.id
@@ -126,7 +128,8 @@ def show_sub_post(subname, post_id):
         data = {'post_id': post_id}
         post = mysql.query_db(post_query, data)    
 
-        comments_query = """SELECT users.username,comments.text, DATE_FORMAT(comments.updated_at, '%b %d, %Y at %r') AS date, comments.post_id 
+        ## TODO: Add to query to include number of votes once votes work ##
+        comments_query = """SELECT users.username, comments.id, comments.text, DATE_FORMAT(comments.updated_at, '%b %d, %Y at %r') AS date, comments.post_id 
         FROM users JOIN comments ON users.id = comments.user_id
         WHERE comments.post_id = :post_id
         ORDER BY comments.created_at DESC
@@ -153,6 +156,8 @@ def show_messages(): #displays all messages sent to currently logged in user and
         subs = mysql.query_db(subs_query, data)
         subnames_query = "SELECT * FROM subreddits"
         subnames = mysql.query_db(subnames_query)
+
+        ## TODO: Get all messages sent to logged in user (where user is recipient) so they can be displayed ##
 
         return render_template('message_center.html', user=user[0], user_subs=subs, all_subreddits=subnames)
     else:
@@ -225,7 +230,7 @@ def logout():
     session.pop('user_id')
     return redirect('/')
 
-@app.route('/sub', methods=['POST'])
+@app.route('/sub', methods=['POST']) #DONE
 def add_sub(): #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
     NAME_REGEX = re.compile(r'^[a-zA-Z0-9_-]+')
     addsubname = request.form['addsubname']
@@ -242,14 +247,21 @@ def add_sub(): #Adds a new subreddit, make sure current logged in user is subscr
         if sub_exists:
             flash("A sub with this name already exists, try something else!")
         else:
+            #adds subreddit
             addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
             addnew_data = {'addsubname':addsubname, 'url':url}
-            mysql.query_db(addnew_query, addnew_data)
+            addnew_id = mysql.query_db(addnew_query, addnew_data)
+
+            #subscribes user to subreddit and makes them moderator
+            subscribe_query = "INSERT INTO subscriptions (user_id, subreddit_id, moderator) VALUES (:user_id, :sub_id, 1)"
+            subscribe_data = {'user_id': session['user_id'], 'sub_id': addnew_id}
+            mysql.query_db(subscribe_query,subscribe_data)
+
             return redirect(url)
     return redirect('/sub_form') #if validations fail, go back to form and flash messages
 
 
-@app.route('/post', methods=['POST'])
+@app.route('/post', methods=['POST']) #DONE
 def add_post():
     #adds a new post to a sub, make sure current user is user_id and sub_id is for correct sub
     title = request.form['title']
@@ -279,7 +291,7 @@ def add_post():
         
     return redirect(url)
 
-@app.route('/comment', methods=['POST'])
+@app.route('/comment', methods=['POST']) #DONE
 def add_comment():
     url = request.form['sub_url'] + "/" + request.form['post_id'] #url to go back to when form is submitted
     if len(request.form['comment']) < 1:
@@ -298,7 +310,8 @@ def add_comment():
 @app.route('/send_message', methods=['POST'])
 def send_message():
     #sends a message to another user (either reply or new send)
-    return
+    # TODO actually put something in message center
+    return redirect('/message_center')
 
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
@@ -310,7 +323,7 @@ def subscribe():
     url = sub_info[0]['url']
 
     #check if user is already subscribed
-    is_subscribed_query = "SELECT * FROM subscriptions WHEREs subscriptions.subreddit_id = :subid AND subscriptions.user_id = :userid"
+    is_subscribed_query = "SELECT * FROM subscriptions WHERE subscriptions.subreddit_id = :subid AND subscriptions.user_id = :userid"
     is_subscribed_data = {'subid':sub_id, 'userid': session['user_id']}
     is_subscribed = mysql.query_db(is_subscribed_query,is_subscribed_data)
 
@@ -319,6 +332,26 @@ def subscribe():
         data = {'user_id': session['user_id'], 'sub_id': sub_id}
         mysql.query_db(query,data)
     
+    return redirect(url)
+
+@app.route('/upvote', methods=['POST'])
+def up():
+    url = request.form['url']
+
+    #TODO 
+    # check if it's a comment or a post
+    # do correct query to change vote (+1?)
+
+    return redirect(url)
+
+@app.route('/downvote', methods=['POST'])
+def down():
+    url = request.form['url']
+
+   #TODO 
+    # check if it's a comment or a post
+    # do correct query to change vote (-1?)
+
     return redirect(url)
 
 

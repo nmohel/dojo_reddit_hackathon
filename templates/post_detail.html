@@ -101,12 +101,16 @@
                                 {% for y in all_comments %}
                                     <div class="row my-2">
                                         <div class="col-1 px-0">
-                                            <span class="mr-1 align-middle">298</span>
+                                            <span class="mr-1 align-middle">298</span> <!-- TODO: Change this to actual number of votes once upvoting works-->
                                             <div class="d-inline-block align-middle">
-                                                <form action="" class="form-inline">
+                                                <form action="/upvote" class="form-inline">
+                                                    <input type="hidden" name="url" value="{{post['url']}}/{{post['id']}}">
+                                                    <input type="hidden" name="comment_id" value="{{ y['id'] }}">                                                       
                                                     <button type="submit" class="btn text-info vote">+</button>
                                                 </form>
-                                                <form action="" class="form-inline">
+                                                <form action="/downvote" class="form-inline">
+                                                    <input type="hidden" name="url" value="{{post['url']}}/{{post['id']}}">                                                    
+                                                    <input type="hidden" name="comment_id" value="{{ y['id'] }}">                                                        
                                                     <button type="submit" class="btn text-info vote">-</button>
                                                 </form>
                                             </div>

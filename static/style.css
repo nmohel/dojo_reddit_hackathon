@@ -29,4 +29,5 @@ body {
 .vote {
     padding: 0;
     background: none;
+    width: 1rem;
 }
