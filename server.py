@@ -8,7 +8,7 @@ app.secret_key = "NotASecretAnymore"
 mysql = MySQLConnector(app,'reddit')
 
 
-### GET ROUTES ###
+## GET ROUTES ###
 @app.route('/')
 def index(): #diplays login/registration page #DONE
     return render_template('index.html')
@@ -42,10 +42,24 @@ def show_sub(subname):
 
 @app.route('/subs/<subname>/<post_id>')
 def show_sub_post(subname, post_id):
-    #displays main page for each post and all it's comments, also displays a form for user to add comment
-    #Add logic to make sure all comments are for this specific post
-    #Make sure we know what post we are on when user tries to add a comment
-    return render_template('post_detail.html')
+    post_query = """SELECT users.username, posts.text, posts.created_at, posts.id , posts.title
+    FROM users JOIN posts ON users.id = posts.user_id
+    WHERE posts.id = :post_id
+    """
+    data = {'post_id': post_id}
+                          
+    post = mysql.query_db(post_query, data)    
+
+    comments_query = """SELECT users.username,comments.text, comments.created_at, comments.post_id 
+    FROM users JOIN comments ON users.id = comments.user_id
+    WHERE comments.post_id = :post_id
+    """
+                          
+    comments = mysql.query_db(comments_query,data)  
+    print post
+
+    return render_template('post_detail.html',post=post[0], all_comments= comments)
+    
 
 @app.route('/message_center')
 def show_messages():
@@ -53,7 +67,7 @@ def show_messages():
     #also displays form to send a new message
     return render_template('message_center.html')
 
-## POST ROUTES ##
+# POST ROUTES ##
 @app.route('/login', methods=['POST']) #DONE
 def login():
     username = request.form['username']
@@ -125,15 +139,29 @@ def add_sub():
     #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
     return
 
+
+
+
+
 @app.route('/post', methods=['POST'])
 def add_post():
-    #adds a new post to a sub, make sure current user is user_id and sub_id is for correct sub
-    return
+    return redirect('/post')
+
+    
+    
 
 @app.route('/comment', methods=['POST'])
 def add_comment():
-    #adds a new comment to a post, make sure current user is user_id and post_id is for correct post
-    return
+    query = "INSERT INTO comments (text, created_at, updated_at,post_id, user_id) VALUES (:text, NOW(), NOW(),:post_id, :user_id)"
+    data = {
+        'text': request.form['comment'],
+        'post_id': request.form['post_id'],
+
+        'user_id': session['user_id'],
+    }
+    mysql.query_db(query,data)
+    return redirect('/post')
+    
 
 @app.route('/send_message', methods=['POST'])
 def send_message():

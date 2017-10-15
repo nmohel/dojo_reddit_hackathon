@@ -36,7 +36,7 @@
                         </div>
                     </li>
                 </ul>
-                <span class="navbar-text mr-1">Welcome {{user['username']}}!</span>
+                <span class="navbar-text mr-1">Welcome!</span>
                 <form action="/logout" method="POST" class="form-inline d-inline-block">
                     <input class="btn btn-outline-info my-2 my-sm-0" type="submit" value="Logout">
                 </form>
@@ -44,7 +44,53 @@
         </nav>
         <div class="container-fluid">
             <div>
-                post works
+                <style>
+                    input {
+                      background-color: #000000;
+                      color: #FFFFFF;
+                      font-weight: bold;
+                      font-size: 15px;
+                      width: 100px;
+                      padding: 10px;
+                      border-radius: 10px;
+                      -moz-border-radius: 10px;
+                      -webkit-border-radius: 10px;}
+                
+                </style>
+              </head>
+              <body>
+                  <h1></h1>
+      
+                  <!-- <form action='/post' method='POST'>
+                      <label for="text">Post a message: </label>
+                      <div>
+                          <textarea rows="15" cols="100" name="text" id="text"></textarea>
+                      </div>
+                      <input type="submit" value="Submit">
+                  </form> -->
+                
+                      
+                      <p> {{ post['username'] }}</p>
+                      <p>{{ post['text'] }}<p>
+                      <p>{{ post['created_at'] }} </p>
+                      
+                      <form action='/comment' method='POST'>
+                          <input type="hidden" name="post_id" value="{{post['id']}}">
+                          <label for="comment">Post a comment: </label>
+                          <p></p>
+                          <textarea rows="10" cols="150" name="comment" id="comment"></textarea>
+                          <input type="submit" value="Submit">
+                      </form>
+                      {% for y in all_comments: %}
+                         
+                              <div style="margin-left: 20px; color:#AD3249" >
+                                  <P>Comments:</P>
+                                  <p>{{ y['username'] }}</p>
+                                  <p>{{ y['created_at'] }} </p>
+                                  <p>{{ y['comment'] }} </p>
+                              </div>
+                      {% endfor %}
+      
             </div>
         </div>
     </body>
