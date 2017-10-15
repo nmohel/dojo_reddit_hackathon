@@ -12,7 +12,7 @@
     </head>
     <body>
         <nav class="navbar navbar-dark bg-dark navbar-expand-lg navbar-fixed-top justify-content-between">
-            <a href='#' class="navbar-brand">Mock Reddit</a>
+            <a href='/main' class="navbar-brand">Mock Reddit</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
             </button>
@@ -30,13 +30,17 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="mySubs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">My Subs</a>
                         <div class="dropdown-menu" aria-labelledby="mySubs">
-                            <a class="dropdown-item" href="#">Sub1</a>
-                            <a class="dropdown-item" href="#">Sub2</a>
-                            <a class="dropdown-item" href="#">Sub3</a>
+                            {% if user_subs %}
+                                {% for sub in user_subs %}
+                                    <a class="dropdown-item" href="{{sub['url']}}">{{sub['name']}}</a>
+                                {% endfor %}
+                            {% else %}
+                                <span class="dropdown-item">No subs yet!</span>
+                            {% endif %}
                         </div>
                     </li>
                 </ul>
-                <span class="navbar-text mr-1">Welcome!</span>
+                <span class="navbar-text mr-2">Welcome {{user['username']}}!</span>
                 <form action="/logout" method="POST" class="form-inline d-inline-block">
                     <input class="btn btn-outline-info my-2 my-sm-0" type="submit" value="Logout">
                 </form>
