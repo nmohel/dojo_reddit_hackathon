@@ -40,7 +40,8 @@ def show_sub(subname):
     sub_info = mysql.query_db(sub_query,sub_data)
 
     #Add logic to make sure all posts we are displaying are for this specific sub
-    post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments FROM posts
+    post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date
+    FROM posts
     LEFT JOIN users ON posts.user_id = users.id
     LEFT JOIN comments ON posts.id = comments.post_id 
     WHERE posts.subreddit_id = :subid
