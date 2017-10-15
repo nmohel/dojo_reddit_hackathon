@@ -23,10 +23,12 @@ def main(): #displays homepage
     JOIN users ON subscriptions.user_id = users.id
     WHERE users.id = :id
     """
+    subnames_query = "SELECT * FROM subreddits"  
     data = {'id': session['user_id']}
     user = mysql.query_db(user_query,data)
     subs = mysql.query_db(subs_query, data)
-    return render_template('homepage.html', user=user[0], user_subs=subs)
+    subnames = mysql.query_db(subnames_query)
+    return render_template('homepage.html', user=user[0], user_subs=subs, all_subreddits=subnames)
 
 @app.route('/sub_form')
 def sub_form():
@@ -122,8 +124,13 @@ def logout():
 
 @app.route('/sub', methods=['POST'])
 def add_sub():
+    addsubname = request.form['addsubname']
+    url = 'subs/' + addsubname
     #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
-    return
+    addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
+    addnew_data = {'addsubname':addsubname, 'url':url}
+    mysql.query_db(addnew_query, addnew_data)
+    return redirect(url)
 
 @app.route('/post', methods=['POST'])
 def add_post():
