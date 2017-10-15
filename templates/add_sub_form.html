@@ -47,13 +47,21 @@
             </div>
         </nav>
         <div class="container-fluid">
-            <div>
-                <p>Make a New Sub!</p>
+            <h2 class="my-3">Make a New Sub!</h2>
+            <div class="col-9">
                 <form action="/sub" method="POST">
-                    <label for="addsubname">Name:</label>
-                    <input type="text" name="addsubname">
-                    <a href="/main">Go Back</a>
-                    <input type="submit" value="Make it!">
+                    <div class="form-group">
+                        <label for="addsubname">Name</label>
+                        <input type="text" class="form-control" id="addsubname" name="addsubname" placeholder="Unique_name">
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">{{message}}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <button type="submit" class="btn btn-primary mr-3">Make it!</button><a class="btn btn-outline-secondary" href="/main">Nevermind..</a>
                 </form>
             </div>
         </div>

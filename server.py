@@ -203,12 +203,25 @@ def logout():
     return redirect('/')
 
 @app.route('/sub', methods=['POST'])
-def add_sub():
-    #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
-    return
+def add_sub(): #Adds a new subreddit, make sure current logged in user is subscribed and set as moderator
+    addsubname = request.form['addsubname']
+    url = '/subs/' + addsubname
 
+    sub_exists_query = "SELECT * FROM subreddits WHERE name = :addsubname"
+    sub_exists_data = {'addsubname': addsubname}
+    sub_exists = mysql.query_db(sub_exists_query, sub_exists_data)
+    if addsubname < 2:
+        flash("subname must be at least 2 characters")
+        return redirect('/sub_form')
+    elif sub_exists:
+        flash("A sub with this name already exists, try something else!")
+        return redirect('/sub_form')
 
-
+    else:
+        addnew_query = "INSERT INTO subreddits (url, created_at, updated_at, name) VALUES (:url ,NOW(), NOW(), :addsubname)"
+        addnew_data = {'addsubname':addsubname, 'url':url}
+        mysql.query_db(addnew_query, addnew_data)
+        return redirect(url)
 
 
 @app.route('/post', methods=['POST'])
