@@ -24,12 +24,12 @@ def main(): #displays homepage
         JOIN users ON subscriptions.user_id = users.id
         WHERE users.id = :id
         """
-        ## TODO: Add to query to include number of votes once votes work ##
-        posts_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date, subreddits.name AS sub_name, subreddits.url AS sub_url
+        posts_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, SUM(post_votes.type) AS num_votes, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date, subreddits.name AS sub_name, subreddits.url AS sub_url
         FROM posts
         LEFT JOIN users ON posts.user_id = users.id
         LEFT JOIN comments ON posts.id = comments.post_id
         LEFT JOIN subreddits ON posts.subreddit_id = subreddits.id
+        LEFT JOIN post_votes ON posts.id = post_votes.post_id
         GROUP BY posts.id
         ORDER BY posts.created_at DESC
         LIMIT 50
@@ -86,11 +86,11 @@ def show_sub(subname):
         sub_data = {'subname': subname}
         sub_info = mysql.query_db(sub_query,sub_data)
 
-        ## TODO: Add to query to include number of votes once votes work ##
-        post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date
+        post_query = """SELECT posts.id, posts.title, users.username, COUNT(comments.id) AS num_comments, SUM(post_votes.type) AS num_votes, DATE_FORMAT(posts.updated_at, '%b %d, %Y at %r') AS date
         FROM posts
         LEFT JOIN users ON posts.user_id = users.id
-        LEFT JOIN comments ON posts.id = comments.post_id 
+        LEFT JOIN comments ON posts.id = comments.post_id
+        LEFT JOIN post_votes ON posts.id = post_votes.post_id 
         WHERE posts.subreddit_id = :subid
         GROUP BY posts.id
         ORDER BY posts.created_at DESC
@@ -129,9 +129,12 @@ def show_sub_post(subname, post_id):
         post = mysql.query_db(post_query, data)    
 
         ## TODO: Add to query to include number of votes once votes work ##
-        comments_query = """SELECT users.username, comments.id, comments.text, DATE_FORMAT(comments.updated_at, '%b %d, %Y at %r') AS date, comments.post_id 
-        FROM users JOIN comments ON users.id = comments.user_id
+        comments_query = """SELECT users.username, comments.id, comments.text, SUM(comment_votes.type) as num_votes, DATE_FORMAT(comments.updated_at, '%b %d, %Y at %r') AS date, comments.post_id 
+        FROM comments 
+        LEFT JOIN users ON users.id = comments.user_id
+        LEFT JOIN comment_votes ON comments.id = comment_votes.comment_id
         WHERE comments.post_id = :post_id
+        GROUP BY comments.id
         ORDER BY comments.created_at DESC
         """     
         comments = mysql.query_db(comments_query,data)
@@ -337,21 +340,59 @@ def subscribe():
 @app.route('/upvote', methods=['POST'])
 def up():
     url = request.form['url']
+    if 'post_id' in request.form:
+        exists_query = "SELECT * FROM post_votes WHERE post_id = :post_id AND user_id = :user_id"
+        data = {
+            'post_id': request.form['post_id'],
+            'user_id': session['user_id']
+        }
+        exist = mysql.query_db(exists_query, data)
+        if exist:
+            query = "UPDATE post_votes SET type = 1 WHERE post_id = :post_id AND user_id = :user_id"
+        else:
+            query = "INSERT into post_votes (post_id, user_id,type) VALUES (:post_id,:user_id,1)"
+    elif 'comment_id' in request.form:
+        exists_query = "SELECT * FROM comment_votes WHERE comment_id = :comment_id AND user_id = :user_id"
+        data = {
+            'comment_id': request.form['comment_id'],
+            'user_id': session['user_id']
+        }
+        exist = mysql.query_db(exists_query, data)
+        if exist:
+            query = "UPDATE comment_votes SET type = 1 WHERE comment_id = :comment_id AND user_id = :user_id"
+        else:
+            query = "INSERT into comment_votes (comment_id, user_id,type) VALUES (:comment_id,:user_id,1)"
 
-    #TODO 
-    # check if it's a comment or a post
-    # do correct query to change vote (type = 1?)
-
+    mysql.query_db(query,data)
     return redirect(url)
 
 @app.route('/downvote', methods=['POST'])
 def down():
     url = request.form['url']
+    if 'post_id' in request.form:
+        exists_query = "SELECT * FROM post_votes WHERE post_id = :post_id AND user_id = :user_id"
+        data = {
+            'post_id': request.form['post_id'],
+            'user_id': session['user_id']
+        }
+        exist = mysql.query_db(exists_query, data)
+        if exist:
+            query = "UPDATE post_votes SET type = -1 WHERE post_id = :post_id AND user_id = :user_id"
+        else:
+            query = "INSERT into post_votes (post_id, user_id,type) VALUES (:post_id,:user_id,-1)"
+    elif 'comment_id' in request.form:
+        exists_query = "SELECT * FROM comment_votes WHERE comment_id = :comment_id AND user_id = :user_id"
+        data = {
+            'comment_id': request.form['comment_id'],
+            'user_id': session['user_id']
+        }
+        exist = mysql.query_db(exists_query, data)
+        if exist:
+            query = "UPDATE comment_votes SET type = -1 WHERE comment_id = :comment_id AND user_id = :user_id"
+        else:
+            query = "INSERT into comment_votes (comment_id, user_id,type) VALUES (:comment_id,:user_id,-1)"
 
-   #TODO 
-    # check if it's a comment or a post
-    # do correct query to change vote (type = -1?)
-
+    mysql.query_db(query,data)
     return redirect(url)
 
 

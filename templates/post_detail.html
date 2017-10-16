@@ -101,7 +101,13 @@
                                 {% for y in all_comments %}
                                     <div class="row my-2">
                                         <div class="col-1 px-0">
-                                            <span class="mr-1 align-middle">298</span> <!-- TODO: Change this to actual number of votes once upvoting works-->
+                                            <span class="mr-1 align-middle">
+                                                {% if y['num_votes'] %}
+                                                    {{y['num_votes']}}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                            </span>
                                             <div class="d-inline-block align-middle">
                                                 <form action="/upvote" method="POST" class="form-inline">
                                                     <input type="hidden" name="url" value="{{post['url']}}/{{post['id']}}">
